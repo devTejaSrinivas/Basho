@@ -1,4 +1,19 @@
-import { people01, people02, people03, facebook, instagram, linkedin, twitter, airbnb, binance, coinbase, dropbox, send, shield, star  } from "../assets";
+import {
+  people01,
+  people02,
+  people03,
+  facebook,
+  instagram,
+  linkedin,
+  twitter,
+  airbnb,
+  binance,
+  coinbase,
+  dropbox,
+  send,
+  shield,
+  star,
+} from "../assets";
 
 export const navLinks = [
   {
@@ -23,23 +38,23 @@ export const features = [
   {
     id: "feature-1",
     icon: star,
-    title: "Rewards",
+    title: "AI-Powered Landmark Recognition",
     content:
-      "The best credit cards offer some tantalizing combinations of promotions and prizes",
+      "Instantly identifies landmarks from uploaded images and generates comprehensive descriptions, covering historical significance, architectural details, and fascinating facts.",
   },
   {
     id: "feature-2",
     icon: shield,
-    title: "100% Secured",
+    title: "Multilingual Support & Accessibility",
     content:
-      "We take proactive steps make sure your information and transactions are secure.",
+      "Provides descriptions in multiple languages and includes accessibility options, ensuring inclusivity for all travelers, including those with visual impairments.",
   },
   {
     id: "feature-3",
     icon: send,
-    title: "Balance Transfer",
+    title: "Personalized & Interactive Insights",
     content:
-      "A balance transfer credit card can save you a lot of money in interest charges.",
+      "Users can input prompts to receive tailored information, allowing for a more engaging and customized learning experience while exploring landmarks.",
   },
 ];
 
