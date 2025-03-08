@@ -10,10 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-three/drei": "^10.0.4",
+    "@react-three/fiber": "^9.1.0",
     "axios": "^1.8.2",
     "globe.gl": "^2.41.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-router-dom": "^7.3.0",
+    "safe-buffer": "^5.2.1",
     "three": "^0.174.0"
   },
   "devDependencies": {
