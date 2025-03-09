@@ -16,6 +16,8 @@
 
 ---
 
+![alt text](image.png)
+
 ## About Basho
 
 **Basho** is an innovative AI-based application designed to enhance the travel experience. When tourists upload a picture of a landmark or monument, Basho analyzes the image and provides detailed descriptions, including:
@@ -23,12 +25,6 @@
 - **Historical Significance**: Learn about the monument's rich history and cultural context.
 - **Architectural Insights**: Discover architectural features, styles, and techniques.
 - **Hidden Stories**: Dive into the secrets and fascinating tales behind the landmark.
-
-### Multi-Language Support
-
-Basho can deliver these insights in a variety of languages, ensuring inclusivity and making it a global companion for travelers everywhere.
-
----
 
 ## Key Features
 
