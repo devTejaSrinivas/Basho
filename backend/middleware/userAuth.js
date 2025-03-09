@@ -1,8 +1,8 @@
 const jwt = require("jsonwebtoken");
 
-const businessAuthMiddleware = (req, res, next) => {
+const userAuthMiddleware = (req, res, next) => {
   try {
-    console.log("stuck in auth");
+    console.log("stuck in user auth");
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(403).json({
@@ -10,9 +10,10 @@ const businessAuthMiddleware = (req, res, next) => {
       });
     }
     const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, process.env.JWT_BUSINESS_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_USER_SECRET);  // Updated the secret to JWT_USER_SECRET for user authentication
+
     if (decoded) {
-      req.userId = decoded.userId;
+      req.userId = decoded.userId;  // Storing the userId from the decoded token in the request
       console.log(req.userId);
       next();
     } else {
@@ -27,4 +28,4 @@ const businessAuthMiddleware = (req, res, next) => {
   }
 };
 
-module.exports = businessAuthMiddleware;
+module.exports = userAuthMiddleware;

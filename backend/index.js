@@ -23,7 +23,7 @@ const dbURI = process.env.MONGO_URI;
 console.log("MongoDB URI:", dbURI);
 
 mongoose
-  .connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(dbURI)
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => {
     console.error("❌ MongoDB connection error:", err);
