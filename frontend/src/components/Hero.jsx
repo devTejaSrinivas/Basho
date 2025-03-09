@@ -1,6 +1,7 @@
 import styles from "../style";
 import GetStarted from "./GetStarted";
 import GlobeComponent from "./GlobeComponent"; // Import the globe
+import WireframeGlobe from "./WireframeGlobe";
 
 const Hero = () => {
   return (
@@ -35,7 +36,7 @@ const Hero = () => {
       <div
         className={`flex-1 flex ${styles.flexCenter} md:my-0 my-10 relative`}
       >
-        <GlobeComponent />
+        <WireframeGlobe />
       </div>
 
       <div className={`ss:hidden ${styles.flexCenter}`}>
