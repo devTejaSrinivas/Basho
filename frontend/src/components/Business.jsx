@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { features } from "../constants";
 import styles, { layout } from "../style";
 import Button from "./Button";
@@ -24,28 +25,36 @@ const FeatureCard = ({ icon, title, content, index }) => (
   </div>
 );
 
-const Business = () => (
-  <section id="features" className={layout.section}>
-    <div className={layout.sectionInfo}>
-      <h2 className={styles.heading2}>
-        You do the travelling, <br className="sm:block hidden" /> we’ll handle
-        the storytelling
-      </h2>
-      <p className={`${styles.paragraph} max-w-[470px] mt-5`}>
-        Discover hidden stories behind every landmark. Snap or upload an image
-        and let our AI reveal its history, architecture, and secrets in an
-        instant.
-      </p>
+const Business = () => {
+  const navigate = useNavigate();
 
-      <Button styles={`mt-10`} />
-    </div>
+  const handleButtonClick = () => {
+    navigate("/chatpage");
+  };
 
-    <div className={`${layout.sectionImg} flex-col`}>
-      {features.map((feature, index) => (
-        <FeatureCard key={feature.id} {...feature} index={index} />
-      ))}
-    </div>
-  </section>
-);
+  return (
+    <section id="features" className={layout.section}>
+      <div className={layout.sectionInfo}>
+        <h2 className={styles.heading2}>
+          You do the travelling, <br className="sm:block hidden" /> we’ll handle
+          the storytelling
+        </h2>
+        <p className={`${styles.paragraph} max-w-[470px] mt-5`}>
+          Discover hidden stories behind every landmark. Snap or upload an image
+          and let our AI reveal its history, architecture, and secrets in an
+          instant.
+        </p>
+
+        <Button styles="mt-10" onClick={handleButtonClick} />
+      </div>
+
+      <div className={`${layout.sectionImg} flex-col`}>
+        {features.map((feature, index) => (
+          <FeatureCard key={feature.id} {...feature} index={index} />
+        ))}
+      </div>
+    </section>
+  );
+};
 
 export default Business;
