@@ -5,10 +5,13 @@ import { BiUpload } from "react-icons/bi"; // Upload icon
 const ChatPage = () => {
   const messageContainerRef = useRef(null);
   const menuRef = useRef(null); // Reference for the menu
+  const videoRef = useRef(null); // Reference for the video element
+  const canvasRef = useRef(null); // Reference for the canvas element
   const [currentMessage, setCurrentMessage] = useState("");
   const [activeChat, setActiveChat] = useState(1);
   const [showMenu, setShowMenu] = useState(false);
-
+  const [cameraActive, setCameraActive] = useState(false); // To track camera state
+  const [capturedImage, setCapturedImage] = useState(null); // To store the captured image data
   const [chats, setChats] = useState([
     {
       id: 1,
@@ -52,30 +55,80 @@ const ChatPage = () => {
     setCurrentMessage("");
   };
 
-  const handleCameraAccess = () => {
-    alert(
-      "Accessing the camera to take a live picture is not implemented yet."
-    );
-    setShowMenu(false);
-  };
-
-  const handleFileUpload = () => {
-    alert("Uploading a file from the local device is not implemented yet.");
-    setShowMenu(false);
-  };
-
-  // Close menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setShowMenu(false);
+  const handleCameraAccess = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
       }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+      setCameraActive(true);
+      setCapturedImage(null); // Clear captured image when accessing the camera again
+    } catch (error) {
+      alert("Unable to access the camera. Please check your permissions.");
+    }
+    setShowMenu(false);
+  };
+
+  const handleTakePicture = () => {
+    if (canvasRef.current && videoRef.current) {
+      const context = canvasRef.current.getContext("2d");
+      context.drawImage(
+        videoRef.current,
+        0,
+        0,
+        canvasRef.current.width,
+        canvasRef.current.height
+      );
+      const imageUrl = canvasRef.current.toDataURL("image/png");
+      setCapturedImage(imageUrl); // Save the captured image to state
+      const newMessage = {
+        id: activeConversation.messages.length + 1,
+        text: null,
+        imageUrl: imageUrl,
+        sender: "user",
+      };
+      setChats((prevChats) =>
+        prevChats.map((chat) =>
+          chat.id === activeChat
+            ? { ...chat, messages: [...chat.messages, newMessage] }
+            : chat
+        )
+      );
+      stopCamera(); // Stop the camera after capturing the image
+    }
+  };
+
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const tracks = videoRef.current.srcObject.getTracks();
+      tracks.forEach((track) => track.stop());
+      videoRef.current.srcObject = null;
+    }
+    setCameraActive(false);
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const newMessage = {
+          id: activeConversation.messages.length + 1,
+          text: null,
+          imageUrl: event.target.result,
+          sender: "user",
+        };
+        setChats((prevChats) =>
+          prevChats.map((chat) =>
+            chat.id === activeChat
+              ? { ...chat, messages: [...chat.messages, newMessage] }
+              : chat
+          )
+        );
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <div
@@ -153,18 +206,29 @@ const ChatPage = () => {
                 marginBottom: "0.5rem",
               }}
             >
-              <div
-                style={{
-                  display: "inline-block",
-                  padding: "0.5rem 1rem",
-                  background:
-                    message.sender === "user" ? "rgb(0, 120, 215)" : "#333",
-                  color: "#fff",
-                  borderRadius: "8px",
-                }}
-              >
-                {message.text}
-              </div>
+              {message.imageUrl ? (
+                <img
+                  src={message.imageUrl}
+                  alt="Uploaded"
+                  style={{
+                    maxWidth: "150px",
+                    borderRadius: "8px",
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    display: "inline-block",
+                    padding: "0.5rem 1rem",
+                    background:
+                      message.sender === "user" ? "rgb(0, 120, 215)" : "#333",
+                    color: "#fff",
+                    borderRadius: "8px",
+                  }}
+                >
+                  {message.text}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -197,7 +261,7 @@ const ChatPage = () => {
             }}
           />
 
-          {/* Camera Icon */}
+          {/* Camera and Upload Menu */}
           <div style={{ position: "relative" }}>
             <button
               type="button"
@@ -221,7 +285,7 @@ const ChatPage = () => {
                 style={{
                   position: "absolute",
                   top: "-6rem",
-                  left: "-3rem", // Adjusted further to the left
+                  left: "-3rem",
                   background: "#222",
                   border: "1px solid #555",
                   borderRadius: "4px",
@@ -247,14 +311,12 @@ const ChatPage = () => {
                   }}
                 >
                   <AiOutlineCamera
-                    size={24} // Increased size for better visibility
-                    style={{ marginRight: "0.5rem", color: "#007bff" }} // Ensured icon is in color
+                    size={24}
+                    style={{ marginRight: "0.5rem", color: "#007bff" }}
                   />
-                  Camera
+                  Open Camera
                 </button>
-                <button
-                  type="button"
-                  onClick={handleFileUpload}
+                <label
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -268,11 +330,17 @@ const ChatPage = () => {
                   }}
                 >
                   <BiUpload
-                    size={24} // Increased size for better visibility
-                    style={{ marginRight: "0.5rem", color: "#007bff" }} // Ensured icon is in color
+                    size={24}
+                    style={{ marginRight: "0.5rem", color: "#007bff" }}
                   />
-                  Upload an image
-                </button>
+                  Upload Image
+                  <input
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={handleFileUpload}
+                  />
+                </label>
               </div>
             )}
           </div>
@@ -291,6 +359,68 @@ const ChatPage = () => {
             Send
           </button>
         </form>
+
+        {/* Camera Display */}
+        {cameraActive && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              padding: "1rem",
+              background: "rgb(20, 20, 20)",
+              color: "#fff",
+            }}
+          >
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              style={{
+                width: "100%",
+                maxWidth: "400px",
+                borderRadius: "8px",
+                marginBottom: "1rem",
+              }}
+            ></video>
+            <canvas
+              ref={canvasRef}
+              width={400}
+              height={300}
+              style={{
+                display: "none", // Used for capturing the picture
+              }}
+            ></canvas>
+            <div style={{ display: "flex", gap: "1rem" }}>
+              <button
+                onClick={handleTakePicture}
+                style={{
+                  padding: "0.5rem 1rem",
+                  background: "#007bff",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                Capture Picture
+              </button>
+              <button
+                onClick={stopCamera}
+                style={{
+                  padding: "0.5rem 1rem",
+                  background: "#dc3545",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                Stop Camera
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
