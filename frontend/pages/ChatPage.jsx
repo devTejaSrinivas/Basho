@@ -3,13 +3,16 @@ import { AiOutlineCamera } from "react-icons/ai"; // Camera icon
 import { BiUpload } from "react-icons/bi"; // Upload icon
 import { FiSend } from "react-icons/fi"; // Send icon
 import { MdCancel } from "react-icons/md"; // Cancel icon
+import  ReactMarkdown  from 'react-markdown';
+import { useNavigate } from 'react-router-dom';
 
 const ChatPage = () => {
-  const messageContainerRef = useRef(null);
+const messageContainerRef = useRef(null);
 const menuRef = useRef(null);
 const videoRef = useRef(null);
 const canvasRef = useRef(null);
 const fileInputRef = useRef(null);
+const navigate = useNavigate();
 
 const [currentMessage, setCurrentMessage] = useState("");
 const [activeChat, setActiveChat] = useState(1);
@@ -20,6 +23,18 @@ const [uploadedImages, setUploadedImages] = useState([]);
 const [pendingMedia, setPendingMedia] = useState([]);
 const [cameraStream, setCameraStream] = useState(null);
 const [isLoading, setIsLoading] = useState(false);
+const [language, setLanguage] = useState("en");
+
+const translations = {
+  en: "Hello, how are you?",
+  hi: "नमस्ते, आप कैसे हैं?",
+  mr: "नमस्कार, तुम्ही कसे आहात?",
+  te: "హలో, మీరు ఎలా ఉన్నారు?",
+  bn: "হ্যালো, আপনি কেমন আছেন?",
+  kn: "ಹಲೋ, ನೀವು ಹೇಗಿದ್ದೀರಾ?",
+  gu: "હેલો, તમે કેમ છો?",
+  pa: "ਹੈਲੋ, ਤੁਸੀਂ ਕਿਵੇਂ ਹੋ?",
+};
 
 const [chats, setChats] = useState([
   {
@@ -28,7 +43,7 @@ const [chats, setChats] = useState([
     messages: [
       {
         id: 1,
-        text: "Welcome to the chat!",
+        text: "Hello! I’m Basho, your AI travel companion. 🌍📸 Share a landmark image with me, and I’ll uncover its story—historical significance, architectural details, and fascinating facts. Whether you're exploring a new place or just curious, I’m here to bring landmarks to life in the language that suits you best. Let’s dive into history together! 🏛️✨",
         sender: "system",
       },
     ],
@@ -84,26 +99,40 @@ const sendToGemini = async (pretext, images) => {
     const formData = new FormData();
     
     // Add the text prompt
-    const text = `GIVEN IMAGES ARE LANDMARK RETURN THE DESCRIPTION, HISTORICAL_SIGNIFICANCE, CONSTRUCTION_TIMELINE, ARCHITECTURAL_FEATURES, INTERESTING_FACTS, MODERN_OUTLOOK AND ADDITTIONAL INQUIERY ${pretext}`;
+    const text = `GIVEN IMAGES ARE LANDMARK RETURN THE DESCRIPTION, HISTORICAL_SIGNIFICANCE, CONSTRUCTION_TIMELINE, ARCHITECTURAL_FEATURES, INTERESTING_FACTS, MODERN_OUTLOOK AND ADDITTIONAL INQUIERY ${pretext}. ANSWER IN THE LANGUAGE ${language}`;
 
     formData.append('prompt', text);
     
     // Add all images
     images.forEach((image, index) => {
-      // Convert base64 string to blob
+      // 1. Extract the Base64 string (removes "data:image/png;base64," part)
       const byteString = atob(image.split(',')[1]);
+      // 2. Extract the MIME type (e.g., "image/png")
       const mimeString = image.split(',')[0].split(':')[1].split(';')[0];
+      // 3. Convert the Base64 string to a binary format
       const ab = new ArrayBuffer(byteString.length);
       const ia = new Uint8Array(ab);
       
       for (let i = 0; i < byteString.length; i++) {
         ia[i] = byteString.charCodeAt(i);
       }
-      
+      // 4. Create a Blob from the binary data
       const blob = new Blob([ab], { type: mimeString });
+      // 5. Append Blob to FormData (for uploading)
       formData.append('images', blob, `image${index}.png`);
     });
     
+
+    // Retrieve existing images array from localStorage (if any)
+    const storedImages = JSON.parse(localStorage.getItem("images")) || [];
+
+    // Add the first image to the array
+    storedImages.push(firstImage);
+
+    // Save updated array back to localStorage
+    localStorage.setItem("images", JSON.stringify(storedImages));
+
+
     // Send the request
     const response = await fetch('http://localhost:5000/user/testchat/genLocation', {
       method: 'POST',
@@ -137,7 +166,7 @@ const sendToGemini = async (pretext, images) => {
     // Add error message to chat
     const errorMessage = {
       id: activeConversation.messages.length + 2,
-      text: `Error: ${error.message}`,
+      text: `Please add at least one image to send a message. Error: ${error.message}`,
       sender: "system",
     };
     
@@ -373,6 +402,66 @@ return (
           {chat.name}
         </div>
       ))}
+
+<div
+      style={{
+        textAlign: "center",
+        padding: "30px",
+        background: "#444",
+        border: "white 5px solid",
+        borderRadius: "10px",
+        width: "100%",
+        margin: "30px auto",
+        color: "#fff",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      <h1 style={{ marginBottom: "20px", fontSize: "30px" }}>Choose Language</h1>
+      
+      <select
+        onChange={(e) => setLanguage(e.target.value)}
+        value={language}
+        style={{
+          padding: "15px 15px",
+          fontSize: "16px",
+          borderRadius: "5px",
+          border: "1px solid #ccc",
+          background: "#222",
+          cursor: "pointer",
+          outline: "none",
+          marginBottom: "20px",
+        }}
+      >
+        <option value="en">English</option>
+        <option value="hi">Hindi (हिन्दी)</option>
+        <option value="mr">Marathi (मराठी)</option>
+        <option value="te">Telugu (తెలుగు)</option>
+        <option value="bn">Bengali (বাংলা)</option>
+        <option value="kn">Kannada (ಕನ್ನಡ)</option>
+        <option value="gu">Gujarati (ગુજરાતી)</option>
+        <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
+      </select>
+
+      <p style={{ fontSize: "22px", marginTop: "10px", fontWeight: "bold", fontSize: "30px" }}>
+        {translations[language]}
+      </p>
+    </div>
+
+    <button style={{
+      fontSize: "25px",
+      width: "100%",
+      padding: "10px 20px",
+      background: "#007bff",
+      color: "white",
+      border: "white 5px solid",
+      borderRadius: "5px",
+      cursor: "pointer",
+      outline: "none",
+      display: "block",
+      margin: "0 auto"
+    }} onClick={()=>{navigate('/deepchat')}}><b>Go Deeper</b> <br></br> <span style={{ color: 'lightgray' }}>get to know more about your "basho" of interest and go deep</span></button>
+   
+      
     </div>
 
     {/* Chat Content */}
@@ -432,7 +521,7 @@ return (
                       wordBreak: "break-word",
                     }}
                   >
-                    {message.text}
+                    <ReactMarkdown key={message.text}>{message.text}</ReactMarkdown>
                   </div>
                 )}
                 
@@ -472,7 +561,7 @@ return (
                   wordBreak: "break-word",
                 }}
               >
-                {message.text}
+                <ReactMarkdown key={message.text}>{message.text}</ReactMarkdown>
               </div>
             )}
           </div>
