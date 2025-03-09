@@ -32,7 +32,7 @@ const LandingPage = () => (
         <Business />
 
         <Testimonials />
-        <Clients />
+
         <CTA />
         <Footer />
       </div>
