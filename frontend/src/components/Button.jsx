@@ -1,15 +1,12 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-const Button = ({ styles }) => (
-  <Link to="/chatpage">
-    <button
-      type="button"
-      className={`py-4 px-6 font-poppins font-medium text-[18px] text-primary bg-blue-gradient rounded-[10px] outline-none ${styles}`}
-    >
-      <a href="/chatpage">Get Started</a>
-    </button>
-  </Link>
+const Button = ({ styles, onClick }) => (
+  <button
+    className={`py-4 px-6 bg-blue-gradient font-poppins font-medium text-[18px] text-primary rounded-[10px] outline-none ${styles}`}
+    onClick={onClick}
+  >
+    Get Started
+  </button>
 );
 
 export default Button;
