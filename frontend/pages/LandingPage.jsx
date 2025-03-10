@@ -13,26 +13,33 @@ import {
 } from "../src/components";
 
 const LandingPage = () => (
-  <div className="bg-primary w-full overflow-hidden">
+  <div
+    style={{ backgroundColor: "#00040f" }}
+    className="w-full overflow-hidden"
+  >
     <div className={`${styles.paddingX} ${styles.flexCenter}`}>
       <div className={`${styles.boxWidth}`}>
         <Navbar />
       </div>
     </div>
 
-    <div className={`bg-primary ${styles.flexStart}`}>
+    <div
+      style={{ backgroundColor: "#00040f" }}
+      className={`${styles.flexStart}`}
+    >
       <div className={`${styles.boxWidth}`}>
         <Hero />
       </div>
     </div>
 
-    <div className={`bg-primary ${styles.paddingX} ${styles.flexCenter}`}>
+    <div
+      style={{ backgroundColor: "#00040f" }}
+      className={`${styles.paddingX} ${styles.flexCenter}`}
+    >
       <div className={`${styles.boxWidth}`}>
         <Stats />
         <Business />
-
         <Testimonials />
-
         <CTA />
         <Footer />
       </div>
