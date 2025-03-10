@@ -1,19 +1,19 @@
 import { useState, useEffect } from "react";
+import { useLocationContext } from "./ContextProvider";
 
 const LocationsList = () => {
   const [locations, setLocations] = useState([]);
   const [selectedIndex, setSelectedIndex] = useState(null);
-  const [context, setContext] = useState(null);
+  const { setContext } = useLocationContext(); // Use shared context
 
   useEffect(() => {
-    // Fetch locations from localStorage
     const storedData = JSON.parse(localStorage.getItem("data")) || [];
     setLocations(storedData);
   }, []);
 
   const handleLocationClick = (index, location) => {
     setSelectedIndex(index);
-    setContext(location.context); // Update context without displaying it
+    setContext(location.context); // Update shared context
   };
 
   return (
@@ -37,15 +37,16 @@ const LocationsList = () => {
                 Location {index + 1}
               </h3>
               <div className="flex flex-wrap gap-2 mt-2">
-                {location.images && location.images.slice(0, 5).map((image, imgIndex) => (
-                  <div key={imgIndex} className="w-20 h-20 overflow-hidden rounded-md">
-                    <img
-                      src={image}
-                      alt={`Location ${index + 1} Image ${imgIndex + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ))}
+                {location.images &&
+                  location.images.slice(0, 5).map((image, imgIndex) => (
+                    <div key={imgIndex} className="w-20 h-20 overflow-hidden rounded-md">
+                      <img
+                        src={image}
+                        alt={`Location ${index + 1} Image ${imgIndex + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ))}
               </div>
             </li>
           ))}

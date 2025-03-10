@@ -1,12 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FiSend } from "react-icons/fi";
-import  LocationsList from "../src/components/LocationsList";
+import LocationsList from "../src/components/LocationsList";
+import { useLocationContext } from "../src/components/ContextProvider";
+import axios from "axios"; // Make sure to install axios
 
 const DeepChatPage = () => {
   const messageContainerRef = useRef(null);
   const [currentMessage, setCurrentMessage] = useState("");
   const [activeChat, setActiveChat] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const { context } = useLocationContext(); // Get location context data
+
+  console.log(context);
 
   // Load chats from localStorage
   const [chats, setChats] = useState(() => {
@@ -17,13 +22,18 @@ const DeepChatPage = () => {
           {
             id: 1,
             name: "Basho",
-            messages: [
-              { id: 1, text: "Welcome to the chat!", sender: "system" },
-            ],
+            messages: [],
           },
         ];
   });
 
+  const activeConversation = chats.find((chat) => chat.id === activeChat) || {
+    id: activeChat,
+    name: "New Chat",
+    messages: []
+  };
+
+  // Auto-scroll to bottom when messages change
   useEffect(() => {
     if (messageContainerRef.current) {
       messageContainerRef.current.scrollTop =
@@ -31,7 +41,72 @@ const DeepChatPage = () => {
     }
   }, [chats]);
 
-  const activeConversation = chats.find((chat) => chat.id === activeChat);
+  useEffect(() => {
+    if (
+      activeConversation && 
+      activeConversation.messages.length === 0 && 
+      context && 
+      Object.keys(context).length > 0 &&
+      !isLoading
+    ) {
+      getInitialAIResponse();
+    }
+  }, [activeChat, context, chats]);
+
+  const getInitialAIResponse = async () => {
+    setIsLoading(true);
+    
+    try {
+      // For initial response, we don't send any messages
+      const response = await axios.post('http://localhost:5000/api/chat', {
+        messages: [],
+        locationContext: context
+      });
+      
+      if (response.data.success) {
+        // Add AI response to chats
+        const updatedChats = chats.map((chat) =>
+          chat.id === activeChat
+            ? {
+                ...chat,
+                messages: [
+                  { 
+                    id: 1, 
+                    text: response.data.response, 
+                    sender: "system" 
+                  },
+                ],
+              }
+            : chat
+        );
+  
+        setChats(updatedChats);
+        localStorage.setItem("chats", JSON.stringify(updatedChats));
+      }
+    } catch (error) {
+      console.error("Error getting initial AI response:", error);
+      // Add a friendly error message to the chat
+      const updatedChats = chats.map((chat) =>
+        chat.id === activeChat
+          ? {
+              ...chat,
+              messages: [
+                { 
+                  id: 1, 
+                  text: "I'm having trouble connecting to the AI service. Please try again later.", 
+                  sender: "system" 
+                },
+              ],
+            }
+          : chat
+      );
+      
+      setChats(updatedChats);
+      localStorage.setItem("chats", JSON.stringify(updatedChats));
+    }
+    
+    setIsLoading(false);
+  };
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -59,35 +134,38 @@ const DeepChatPage = () => {
     setIsLoading(true);
 
     try {
-      // Prepare conversation history for Gemini
-      const chatHistory = activeConversation.messages.map((msg) => ({
-        role: msg.sender === "user" ? "user" : "model",
-        parts: [{ text: msg.text }],
-      }));
-
-      chatHistory.push({ role: "user", parts: [{ text: messageText }] });
-
-      const chatSession = model.startChat({ history: chatHistory });
-
-      // Send message to Gemini
-      let result = await chatSession.sendMessage(messageText);
-      const botResponse = result.response.text();
-
-      // Add AI response to chats
-      const updatedChatsWithResponse = chats.map((chat) =>
-        chat.id === activeChat
-          ? {
-              ...chat,
-              messages: [
-                ...chat.messages,
-                { id: chat.messages.length + 1, text: botResponse, sender: "system" },
-              ],
-            }
-          : chat
+      // Get updated active conversation after adding user message
+      const updatedActiveConversation = updatedChats.find(
+        (chat) => chat.id === activeChat
       );
+      
+      // Call the backend endpoint with full message history and location context
+      const response = await axios.post('http://localhost:5000/user/deepchat', {
+        messages: updatedActiveConversation.messages,
+        locationContext: context
+      });
+      
+      if (response.data.success) {
+        // Add AI response to chats
+        const updatedChatsWithResponse = chats.map((chat) =>
+          chat.id === activeChat
+            ? {
+                ...chat,
+                messages: [
+                  ...chat.messages,
+                  { 
+                    id: chat.messages.length + 2, 
+                    text: response.data.response, 
+                    sender: "system" 
+                  },
+                ],
+              }
+            : chat
+        );
 
-      setChats(updatedChatsWithResponse);
-      localStorage.setItem("chats", JSON.stringify(updatedChatsWithResponse));
+        setChats(updatedChatsWithResponse);
+        localStorage.setItem("chats", JSON.stringify(updatedChatsWithResponse));
+      }
     } catch (error) {
       console.error("Error sending message:", error);
     }
@@ -123,7 +201,6 @@ const DeepChatPage = () => {
           >
             {chat.name}
           </div>
-          
         ))}
         <LocationsList></LocationsList>
       </div>
