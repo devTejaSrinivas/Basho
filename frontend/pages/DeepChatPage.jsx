@@ -1,24 +1,28 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FiSend } from "react-icons/fi";
+import  LocationsList from "../src/components/LocationsList";
 
 const DeepChatPage = () => {
   const messageContainerRef = useRef(null);
   const [currentMessage, setCurrentMessage] = useState("");
   const [activeChat, setActiveChat] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [chats, setChats] = useState([
-    {
-      id: 1,
-      name: "Basho",
-      messages: [
-        {
-          id: 1,
-          text: "Welcome to the chat!",
-          sender: "system",
-        },
-      ],
-    },
-  ]);
+
+  // Load chats from localStorage
+  const [chats, setChats] = useState(() => {
+    const savedChats = localStorage.getItem("chats");
+    return savedChats
+      ? JSON.parse(savedChats)
+      : [
+          {
+            id: 1,
+            name: "Basho",
+            messages: [
+              { id: 1, text: "Welcome to the chat!", sender: "system" },
+            ],
+          },
+        ];
+  });
 
   useEffect(() => {
     if (messageContainerRef.current) {
@@ -36,48 +40,59 @@ const DeepChatPage = () => {
     const messageText = currentMessage.trim();
     setCurrentMessage("");
 
-    // Add user message
-    setChats((prevChats) =>
-      prevChats.map((chat) =>
+    // Add user message to chats
+    const updatedChats = chats.map((chat) =>
+      chat.id === activeChat
+        ? {
+            ...chat,
+            messages: [
+              ...chat.messages,
+              { id: chat.messages.length + 1, text: messageText, sender: "user" },
+            ],
+          }
+        : chat
+    );
+
+    setChats(updatedChats);
+    localStorage.setItem("chats", JSON.stringify(updatedChats));
+
+    setIsLoading(true);
+
+    try {
+      // Prepare conversation history for Gemini
+      const chatHistory = activeConversation.messages.map((msg) => ({
+        role: msg.sender === "user" ? "user" : "model",
+        parts: [{ text: msg.text }],
+      }));
+
+      chatHistory.push({ role: "user", parts: [{ text: messageText }] });
+
+      const chatSession = model.startChat({ history: chatHistory });
+
+      // Send message to Gemini
+      let result = await chatSession.sendMessage(messageText);
+      const botResponse = result.response.text();
+
+      // Add AI response to chats
+      const updatedChatsWithResponse = chats.map((chat) =>
         chat.id === activeChat
           ? {
               ...chat,
               messages: [
                 ...chat.messages,
-                {
-                  id: chat.messages.length + 1,
-                  text: messageText,
-                  sender: "user",
-                },
+                { id: chat.messages.length + 1, text: botResponse, sender: "system" },
               ],
             }
           : chat
-      )
-    );
-
-    setIsLoading(true);
-    
-    // Simulate AI response
-    setTimeout(() => {
-      setChats((prevChats) =>
-        prevChats.map((chat) =>
-          chat.id === activeChat
-            ? {
-                ...chat,
-                messages: [
-                  ...chat.messages,
-                  {
-                    id: chat.messages.length + 1,
-                    text: "This is a simulated response",
-                    sender: "system",
-                  },
-                ],
-              }
-            : chat
-        )
       );
-      setIsLoading(false);
-    }, 1000);
+
+      setChats(updatedChatsWithResponse);
+      localStorage.setItem("chats", JSON.stringify(updatedChatsWithResponse));
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+
+    setIsLoading(false);
   };
 
   return (
@@ -108,7 +123,9 @@ const DeepChatPage = () => {
           >
             {chat.name}
           </div>
+          
         ))}
+        <LocationsList></LocationsList>
       </div>
 
       {/* Chat Content */}

@@ -123,16 +123,6 @@ const sendToGemini = async (pretext, images) => {
     });
     
 
-    // Retrieve existing images array from localStorage (if any)
-    const storedImages = JSON.parse(localStorage.getItem("images")) || [];
-
-    // Add the first image to the array
-    storedImages.push(firstImage);
-
-    // Save updated array back to localStorage
-    localStorage.setItem("images", JSON.stringify(storedImages));
-
-
     // Send the request
     const response = await fetch('http://localhost:5000/user/testchat/genLocation', {
       method: 'POST',
@@ -144,6 +134,19 @@ const sendToGemini = async (pretext, images) => {
     }
     
     const result = await response.json();
+
+    // Retrieve existing `data` array from localStorage (if any)
+    const storedData = JSON.parse(localStorage.getItem("data")) || [];
+
+    // Add the entire images array and context
+    storedData.push({
+        images: images,   // Store all images
+        context: result.response, // Store context
+    });
+
+    // Save updated array back to localStorage
+    localStorage.setItem("data", JSON.stringify(storedData));
+
     
     // Add Gemini's response to the chat
     const aiMessage = {

@@ -10,10 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/styled": "^11.14.0",
+    "@google/generative-ai": "^0.24.0",
     "@mui/icons-material": "^6.4.7",
     "@react-three/drei": "^10.0.4",
     "@react-three/fiber": "^9.1.0",
     "axios": "^1.8.2",
+    "dotenv": "^16.4.7",
     "framer-motion": "^12.4.10",
     "globe.gl": "^2.41.1",
     "i": "^0.3.7",
