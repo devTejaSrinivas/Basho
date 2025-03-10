@@ -477,9 +477,9 @@ const ChatPage = () => {
             navigate("/deepchat");
           }}
         >
-          <b>Go Deeper</b> <br></br>{" "}
+          <b>Deep Talk</b> <br></br>{" "}
           <span style={{ color: "lightgray" }}>
-            get to know more about your "basho" of interest and go deep
+            Know more about your "Basho" of interest
           </span>
         </button>
       </div>
