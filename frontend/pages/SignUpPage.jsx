@@ -1,117 +1,336 @@
-import React from "react";
-import { useRef } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 
 const SignUpPage = () => {
-  const emailRef = useRef(null);
-  const passRef = useRef(null);
-  const nameRef = useRef(null);
-  const nav = useNavigate();
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    username: "",
+    password: "",
+    confirmPassword: "",
+  });
 
-  const handleSignup = async (e) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState(null);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const email = emailRef.current.value;
-    const password = passRef.current.value;
-    const name = nameRef.current.value;
 
-    try {
-      const response = await fetch("http://localhost:3000/user/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password, name }),
+    // Basic validation
+    if (formData.password !== formData.confirmPassword) {
+      setMessage({
+        type: "error",
+        text: "Passwords do not match!",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    setMessage(null);
+
+    // Simulate API call
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setMessage({
+        type: "success",
+        text: "Account created successfully! Redirecting to login...",
       });
 
-      const data = await response.json();
+      // Redirect to sign-in after successful signup
+      setTimeout(() => {
+        navigate("/signin");
+      }, 1500);
+    }, 1000);
+  };
 
-      if (data.message === "Signup successful") {
-        toast.success("Account created successfully");
-        nav("/user/login", { replace: true });
-      } else {
-        toast.error("Signup failed: " + (data.message || "Invalid input"));
-      }
-    } catch (error) {
-      console.error("Signup error:", error);
-      toast.error("An error occurred during signup. Please try again.");
-    }
+  const styles = {
+    container: {
+      minHeight: "100vh",
+      background: "linear-gradient(to bottom right, #EEF2FF, #F3E8FF)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "16px",
+    },
+    card: {
+      maxWidth: "500px",
+      width: "100%",
+      backgroundColor: "#FFFFFF",
+      borderRadius: "8px",
+      boxShadow: "0 10px 25px rgba(0, 0, 0, 0.1)",
+      overflow: "hidden",
+    },
+    header: {
+      background: "linear-gradient(to right, #3B82F6, #4F46E5)",
+      padding: "24px",
+      textAlign: "center",
+    },
+    title: {
+      fontSize: "28px",
+      fontWeight: "bold",
+      color: "#FFFFFF",
+      margin: "0",
+      fontFamily: "system-ui, -apple-system, sans-serif",
+    },
+    subtitle: {
+      color: "rgba(238, 242, 255, 0.9)",
+      fontSize: "14px",
+      marginTop: "8px",
+    },
+    formContainer: {
+      padding: "32px",
+    },
+    formGroup: {
+      marginBottom: "20px",
+    },
+    label: {
+      display: "block",
+      color: "#374151",
+      fontSize: "14px",
+      fontWeight: "500",
+      marginBottom: "8px",
+      fontFamily: "system-ui, -apple-system, sans-serif",
+    },
+    input: {
+      width: "100%",
+      padding: "10px 12px",
+      border: "1px solid #D1D5DB",
+      borderRadius: "6px",
+      fontSize: "16px",
+      outline: "none",
+      transition: "border-color 0.2s, box-shadow 0.2s",
+      boxSizing: "border-box",
+    },
+    inputFocus: {
+      borderColor: "#4F46E5",
+      boxShadow: "0 0 0 3px rgba(79, 70, 229, 0.2)",
+    },
+    row: {
+      display: "flex",
+      gap: "16px",
+    },
+    column: {
+      flex: "1",
+      width: "100%",
+    },
+    button: {
+      width: "100%",
+      padding: "12px",
+      background: "linear-gradient(to right, #3B82F6, #4F46E5)",
+      border: "none",
+      borderRadius: "6px",
+      color: "white",
+      fontSize: "16px",
+      fontWeight: "500",
+      cursor: "pointer",
+      transition: "opacity 0.2s",
+      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+    },
+    buttonHover: {
+      opacity: 0.9,
+      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+    },
+    buttonDisabled: {
+      opacity: 0.7,
+      cursor: "not-allowed",
+    },
+    message: {
+      padding: "12px",
+      borderRadius: "6px",
+      marginTop: "16px",
+      textAlign: "center",
+    },
+    successMessage: {
+      backgroundColor: "rgba(209, 250, 229, 0.8)",
+      color: "#065F46",
+    },
+    errorMessage: {
+      backgroundColor: "rgba(254, 226, 226, 0.8)",
+      color: "#991B1B",
+    },
+    footer: {
+      marginTop: "24px",
+      textAlign: "center",
+      fontSize: "14px",
+      color: "#6B7280",
+    },
+    link: {
+      color: "#4F46E5",
+      textDecoration: "none",
+      fontWeight: "500",
+      marginLeft: "4px",
+    },
+    passwordRequirements: {
+      fontSize: "12px",
+      color: "#6B7280",
+      marginTop: "6px",
+    },
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#081A42] pt-20">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 w-full h-1/2 bg-gradient-to-b from-[#081A42] via-[#0F3A68] to-transparent"></div>
-        <div className="absolute -right-48 top-48 w-96 h-96 bg-[#328AB0]/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -left-48 bottom-48 w-96 h-96 bg-[#42A4E0]/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute left-1/2 top-1/3 -translate-x-1/2 w-96 h-96 bg-[#1D78A0]/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-      </div>
+    <div style={styles.container}>
+      <div style={styles.card}>
+        <div style={styles.header}>
+          <h1 style={styles.title}>Basho</h1>
+          <p style={styles.subtitle}>Create your account</p>
+        </div>
 
-      {/* Main content */}
-      <div className="relative z-10 w-full max-w-md px-4">
-        <div className="bg-white p-8 rounded-3xl shadow-lg border border-[#328AB0]/20">
-          <div className="mb-8 text-center">
-            <h2 className="text-4xl font-bold bg-gradient-to-r from-[#42A4E0] to-[#1D78A0] text-transparent bg-clip-text">
-              Create Account
-            </h2>
-            <p className="mt-2 text-[#081A42]">Sign up to get started</p>
-          </div>
+        <div style={styles.formContainer}>
+          <form onSubmit={handleSubmit}>
+            <div style={styles.formGroup}>
+              <label htmlFor="fullName" style={styles.label}>
+                Full Name
+              </label>
+              <input
+                type="text"
+                id="fullName"
+                name="fullName"
+                value={formData.fullName}
+                onChange={handleChange}
+                style={styles.input}
+                placeholder="Enter your full name"
+                onFocus={(e) =>
+                  (e.target.style.boxShadow = styles.inputFocus.boxShadow)
+                }
+                onBlur={(e) => (e.target.style.boxShadow = "none")}
+                required
+              />
+            </div>
 
-          <form className="space-y-6">
-            <div className="space-y-4">
-              <div className="relative group">
-                <input
-                  type="text"
-                  name="name"
-                  ref={nameRef}
-                  placeholder="Full Name"
-                  className="w-full px-5 py-4 rounded-2xl bg-[#F9FAFB] border-2 border-[#328AB0]/20 text-[#081A42] placeholder-[#A1C6D2] focus:outline-none focus:border-[#42A4E0] transition-all duration-300 group-hover:border-[#42A4E0]/50"
-                  required
-                />
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#42A4E0]/20 to-[#1D78A0]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur"></div>
-              </div>
+            <div style={styles.formGroup}>
+              <label htmlFor="email" style={styles.label}>
+                Email Address
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                style={styles.input}
+                placeholder="Enter your email address"
+                onFocus={(e) =>
+                  (e.target.style.boxShadow = styles.inputFocus.boxShadow)
+                }
+                onBlur={(e) => (e.target.style.boxShadow = "none")}
+                required
+              />
+            </div>
 
-              <div className="relative group">
-                <input
-                  type="email"
-                  name="mail"
-                  ref={emailRef}
-                  placeholder="Email"
-                  className="w-full px-5 py-4 rounded-2xl bg-[#F9FAFB] border-2 border-[#328AB0]/20 text-[#081A42] placeholder-[#A1C6D2] focus:outline-none focus:border-[#42A4E0] transition-all duration-300 group-hover:border-[#42A4E0]/50"
-                  required
-                />
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#42A4E0]/20 to-[#1D78A0]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur"></div>
-              </div>
+            <div style={styles.formGroup}>
+              <label htmlFor="username" style={styles.label}>
+                Username
+              </label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                style={styles.input}
+                placeholder="Choose a username"
+                onFocus={(e) =>
+                  (e.target.style.boxShadow = styles.inputFocus.boxShadow)
+                }
+                onBlur={(e) => (e.target.style.boxShadow = "none")}
+                required
+              />
+            </div>
 
-              <div className="relative group">
+            <div style={styles.row}>
+              <div style={{ ...styles.column, ...styles.formGroup }}>
+                <label htmlFor="password" style={styles.label}>
+                  Password
+                </label>
                 <input
                   type="password"
-                  name="pass"
-                  ref={passRef}
-                  placeholder="Password"
-                  className="w-full px-5 py-4 rounded-2xl bg-[#F9FAFB] border-2 border-[#328AB0]/20 text-[#081A42] placeholder-[#A1C6D2] focus:outline-none focus:border-[#42A4E0] transition-all duration-300 group-hover:border-[#42A4E0]/50"
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  style={styles.input}
+                  placeholder="Create a password"
+                  onFocus={(e) =>
+                    (e.target.style.boxShadow = styles.inputFocus.boxShadow)
+                  }
+                  onBlur={(e) => (e.target.style.boxShadow = "none")}
                   required
                 />
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#42A4E0]/20 to-[#1D78A0]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur"></div>
+                <p style={styles.passwordRequirements}>
+                  Min. 8 characters with at least 1 number
+                </p>
+              </div>
+
+              <div style={{ ...styles.column, ...styles.formGroup }}>
+                <label htmlFor="confirmPassword" style={styles.label}>
+                  Confirm Password
+                </label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  style={styles.input}
+                  placeholder="Confirm your password"
+                  onFocus={(e) =>
+                    (e.target.style.boxShadow = styles.inputFocus.boxShadow)
+                  }
+                  onBlur={(e) => (e.target.style.boxShadow = "none")}
+                  required
+                />
               </div>
             </div>
 
-            <button
-              type="button"
-              className="w-full bg-[#42A4E0] text-white py-4 rounded-2xl hover:bg-[#1D78A0] focus:outline-none transition-colors duration-300"
-              onClick={handleSignup}
-            >
-              Sign Up
-            </button>
+            <div style={{ ...styles.formGroup, marginTop: "24px" }}>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                style={{
+                  ...styles.button,
+                  ...(isSubmitting ? styles.buttonDisabled : {}),
+                }}
+                onMouseOver={(e) => {
+                  if (!isSubmitting)
+                    Object.assign(e.target.style, styles.buttonHover);
+                }}
+                onMouseOut={(e) => {
+                  if (!isSubmitting) e.target.style.opacity = "1";
+                }}
+              >
+                {isSubmitting ? "Creating Account..." : "Create Account"}
+              </button>
+            </div>
+
+            {message && (
+              <div
+                style={{
+                  ...styles.message,
+                  ...(message.type === "success"
+                    ? styles.successMessage
+                    : styles.errorMessage),
+                }}
+              >
+                {message.text}
+              </div>
+            )}
           </form>
 
-          <p className="mt-8 text-center text-[#A1C6D2]">
-            Already have an account?{' '}
-            <a href="/user/login" className="text-[#42A4E0] hover:text-[#1D78A0] font-medium transition-colors">
-              Log in
+          <div style={styles.footer}>
+            <span>Already have an account?</span>
+            <a href="/signin" style={styles.link}>
+              Sign in
             </a>
-          </p>
+          </div>
         </div>
       </div>
     </div>
