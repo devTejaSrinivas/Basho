@@ -1,132 +1,267 @@
 import React, { useState } from "react";
-import { Facebook, GitHub, Google } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
-const Login = () => {
-  const [isLogin, setIsLogin] = useState(true);
+const SignInPage = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+  });
 
-  const [loginEmail, setLoginEmail] = useState("");
-  const [loginPassword, setLoginPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState(null);
 
-  const [registerEmail, setRegisterEmail] = useState("");
-  const [registerPassword, setRegisterPassword] = useState("");
-  const [registerName, setRegisterName] = useState("");
-  const [registerAvatar, setRegisterAvatar] = useState("");
-
-  const LoginForm = () => {
-    return (
-      <div className="bg-white rounded-2xl shadow-2xl flex flex-col w-full md:w-1/3 items-center max-w-4xl transition duration-1000 ease-out">
-        <h2 className="p-3 text-3xl font-bold text-pink-400">Horiz</h2>
-        <div className="inline-block border-[1px] justify-center w-20 border-blue-400 border-solid"></div>
-        <h3 className="text-xl font-semibold text-blue-400 pt-2">Sign In!</h3>
-        <div className="flex space-x-2 m-4 items-center justify-center">
-          <div className="socialIcon">
-            <Facebook />
-          </div>
-          <div className="socialIcon">
-            <GitHub />
-          </div>
-          <div className="socialIcon">
-            <Google />
-          </div>
-        </div>
-        {/* Inputs */}
-        <div className="flex flex-col items-center justify-center">
-          <input
-            type="email"
-            className="rounded-2xl px-2 py-1 w-4/5 md:w-full border-[1px] border-blue-400 m-1 focus:shadow-md focus:border-pink-400 focus:outline-none focus:ring-0"
-            placeholder="Email"
-          ></input>
-          <input
-            type="password"
-            className="rounded-2xl px-2 py-1 w-4/5 md:w-full border-[1px] border-blue-400 m-1 focus:shadow-md focus:border-pink-400 focus:outline-none focus:ring-0"
-            placeholder="Password"
-          ></input>
-          <button className="rounded-2xl m-2 text-white bg-blue-400 w-2/5 px-4 py-2 shadow-md hover:text-blue-400 hover:bg-white transition duration-200 ease-in">
-            Sign In
-          </button>
-        </div>
-        <div className="inline-block border-[1px] justify-center w-20 border-blue-400 border-solid"></div>
-        <p className="text-blue-400 mt-4 text-sm">Don't have an account?</p>
-        <p
-          className="text-blue-400 mb-4 text-sm font-medium cursor-pointer"
-          onClick={() => setIsLogin(false)}
-        >
-          Create a New Account?
-        </p>
-      </div>
-    );
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
-  const SignUpForm = () => {
-    return (
-      <div className="bg-blue-400 text-white rounded-2xl shadow-2xl  flex flex-col w-full  md:w-1/3 items-center max-w-4xl transition duration-1000 ease-in">
-        <h2 className="p-3 text-3xl font-bold text-white">Horiz</h2>
-        <div className="inline-block border-[1px] justify-center w-20 border-white border-solid"></div>
-        <h3 className="text-xl font-semibold text-white pt-2">
-          Create Account!
-        </h3>
-        <div className="flex space-x-2 m-4 items-center justify-center">
-          <div className="socialIcon border-white">
-            <Facebook className="text-white" />
-          </div>
-          <div className="socialIcon border-white">
-            <GitHub className="text-white" />
-          </div>
-          <div className="socialIcon border-white">
-            <Google className="text-white" />
-          </div>
-        </div>
-        {/* Inputs */}
-        <div className="flex flex-col items-center justify-center mt-2">
-          <input
-            type="password"
-            className="rounded-2xl px-2 py-1 w-4/5 md:w-full border-[1px] border-blue-400 m-1 focus:shadow-md focus:border-pink-400 focus:outline-none focus:ring-0"
-            placeholder="Name"
-          ></input>
-          <input
-            type="email"
-            className="rounded-2xl px-2 py-1 w-4/5 md:w-full border-[1px] border-blue-400 m-1 focus:shadow-md focus:border-pink-400 focus:outline-none focus:ring-0"
-            placeholder="Email"
-          ></input>
-          <input
-            type="password"
-            className="rounded-2xl px-2 py-1 w-4/5 md:w-full border-[1px] border-blue-400 m-1 focus:shadow-md focus:border-pink-400 focus:outline-none focus:ring-0"
-            placeholder="Password"
-          ></input>
-          <input
-            type="password"
-            className="rounded-2xl px-2 py-1 w-4/5 md:w-full border-[1px] border-blue-400 m-1 focus:shadow-md focus:border-pink-400 focus:outline-none focus:ring-0"
-            placeholder="Avatar URL"
-          ></input>
-          <button className="rounded-2xl m-4 text-blue-400 bg-white w-3/5 px-4 py-2 shadow-md hover:text-white hover:bg-blue-400 transition duration-200 ease-in">
-            Sign Up
-          </button>
-        </div>
-        <div className="inline-block border-[1px] justify-center w-20 border-white border-solid"></div>
-        <p className="text-white mt-4 text-sm">Already have an account?</p>
-        <p
-          className="text-white mb-4 text-sm font-medium cursor-pointer"
-          onClick={() => setIsLogin(true)}
-        >
-          Sign In to your Account?
-        </p>
-      </div>
-    );
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setMessage(null);
+
+    // Simulate API call
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setMessage({
+        type: "success",
+        text: "Sign in successful! Redirecting...",
+      });
+
+      // Redirect to /chat after successful login
+      setTimeout(() => {
+        navigate("/chat");
+      }, 1000);
+    }, 1000);
+  };
+
+  const styles = {
+    container: {
+      minHeight: "100vh",
+      background: "linear-gradient(to bottom right, #EEF2FF, #F3E8FF)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "16px",
+    },
+    card: {
+      maxWidth: "400px",
+      width: "100%",
+      backgroundColor: "#FFFFFF",
+      borderRadius: "8px",
+      boxShadow: "0 10px 25px rgba(0, 0, 0, 0.1)",
+      overflow: "hidden",
+    },
+    header: {
+      background: "linear-gradient(to right, #3B82F6, #4F46E5)",
+      padding: "24px",
+      textAlign: "center",
+    },
+    title: {
+      fontSize: "28px",
+      fontWeight: "bold",
+      color: "#FFFFFF",
+      margin: "0",
+      fontFamily: "system-ui, -apple-system, sans-serif",
+    },
+    subtitle: {
+      color: "rgba(238, 242, 255, 0.9)",
+      fontSize: "14px",
+      marginTop: "8px",
+    },
+    formContainer: {
+      padding: "32px",
+    },
+    formGroup: {
+      marginBottom: "24px",
+    },
+    label: {
+      display: "block",
+      color: "#374151",
+      fontSize: "14px",
+      fontWeight: "500",
+      marginBottom: "8px",
+      fontFamily: "system-ui, -apple-system, sans-serif",
+    },
+    input: {
+      width: "100%",
+      padding: "10px 12px",
+      border: "1px solid #D1D5DB",
+      borderRadius: "6px",
+      fontSize: "16px",
+      outline: "none",
+      transition: "border-color 0.2s, box-shadow 0.2s",
+      boxSizing: "border-box",
+    },
+    inputFocus: {
+      borderColor: "#4F46E5",
+      boxShadow: "0 0 0 3px rgba(79, 70, 229, 0.2)",
+    },
+    forgotPassword: {
+      fontSize: "12px",
+      color: "#4F46E5",
+      textDecoration: "none",
+      float: "right",
+      marginTop: "4px",
+    },
+    button: {
+      width: "100%",
+      padding: "12px",
+      background: "linear-gradient(to right, #3B82F6, #4F46E5)",
+      border: "none",
+      borderRadius: "6px",
+      color: "white",
+      fontSize: "16px",
+      fontWeight: "500",
+      cursor: "pointer",
+      transition: "opacity 0.2s",
+      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+    },
+    buttonHover: {
+      opacity: 0.9,
+      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+    },
+    buttonDisabled: {
+      opacity: 0.7,
+      cursor: "not-allowed",
+    },
+    message: {
+      padding: "12px",
+      borderRadius: "6px",
+      marginTop: "16px",
+      textAlign: "center",
+    },
+    successMessage: {
+      backgroundColor: "rgba(209, 250, 229, 0.8)",
+      color: "#065F46",
+    },
+    errorMessage: {
+      backgroundColor: "rgba(254, 226, 226, 0.8)",
+      color: "#991B1B",
+    },
+    footer: {
+      marginTop: "24px",
+      textAlign: "center",
+      fontSize: "14px",
+      color: "#6B7280",
+    },
+    link: {
+      color: "#4F46E5",
+      textDecoration: "none",
+      fontWeight: "500",
+      marginLeft: "4px",
+    },
+    labelContainer: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: "8px",
+    },
   };
 
   return (
-    <div className="bg-gray-100 flex flex-col items-center justify-center min-h-screen md:py-2">
-      <main className="flex items-center w-full px-2 md:px-20">
-        <div className="hidden md:inline-flex flex-col flex-1 space-y-1">
-          <p className="text-6xl text-blue-500 font-bold">Horiz</p>
-          <p className="font-medium text-lg leading-1 text-pink-400">
-            Explore your interests, meet new friends & expand your horions
-          </p>
+    <div style={styles.container}>
+      <div style={styles.card}>
+        <div style={styles.header}>
+          <h1 style={styles.title}>Basho</h1>
+          <p style={styles.subtitle}>Sign in to your account</p>
         </div>
-        {isLogin ? <LoginForm /> : <SignUpForm />}
-      </main>
+
+        <div style={styles.formContainer}>
+          <form onSubmit={handleSubmit}>
+            <div style={styles.formGroup}>
+              <label htmlFor="username" style={styles.label}>
+                Username
+              </label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                style={styles.input}
+                placeholder="Enter your username"
+                onFocus={(e) =>
+                  (e.target.style.boxShadow = styles.inputFocus.boxShadow)
+                }
+                onBlur={(e) => (e.target.style.boxShadow = "none")}
+                required
+              />
+            </div>
+
+            <div style={styles.formGroup}>
+              <div style={styles.labelContainer}>
+                <label htmlFor="password" style={styles.label}>
+                  Password
+                </label>
+                <a href="#" style={styles.forgotPassword}>
+                  Forgot password?
+                </a>
+              </div>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                style={styles.input}
+                placeholder="Enter your password"
+                onFocus={(e) =>
+                  (e.target.style.boxShadow = styles.inputFocus.boxShadow)
+                }
+                onBlur={(e) => (e.target.style.boxShadow = "none")}
+                required
+              />
+            </div>
+
+            <div style={styles.formGroup}>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                style={{
+                  ...styles.button,
+                  ...(isSubmitting ? styles.buttonDisabled : {}),
+                }}
+                onMouseOver={(e) => {
+                  if (!isSubmitting)
+                    Object.assign(e.target.style, styles.buttonHover);
+                }}
+                onMouseOut={(e) => {
+                  if (!isSubmitting) e.target.style.opacity = "1";
+                }}
+              >
+                {isSubmitting ? "Signing in..." : "Sign In"}
+              </button>
+            </div>
+
+            {message && (
+              <div
+                style={{
+                  ...styles.message,
+                  ...(message.type === "success"
+                    ? styles.successMessage
+                    : styles.errorMessage),
+                }}
+              >
+                {message.text}
+              </div>
+            )}
+          </form>
+
+          <div style={styles.footer}>
+            <span>Don't have an account?</span>
+            <a href="/signup" style={styles.link}>
+              Create one
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default Login;
+export default SignInPage;
