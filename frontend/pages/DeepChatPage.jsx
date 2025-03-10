@@ -30,7 +30,7 @@ const DeepChatPage = () => {
   const activeConversation = chats.find((chat) => chat.id === activeChat) || {
     id: activeChat,
     name: "New Chat",
-    messages: []
+    messages: [],
   };
 
   // Auto-scroll to bottom when messages change
@@ -43,9 +43,9 @@ const DeepChatPage = () => {
 
   useEffect(() => {
     if (
-      activeConversation && 
-      activeConversation.messages.length === 0 && 
-      context && 
+      activeConversation &&
+      activeConversation.messages.length === 0 &&
+      context &&
       Object.keys(context).length > 0 &&
       !isLoading
     ) {
@@ -55,14 +55,17 @@ const DeepChatPage = () => {
 
   const getInitialAIResponse = async () => {
     setIsLoading(true);
-    
+
     try {
       // For initial response, we don't send any messages
-      const response = await axios.post('http://localhost:5000/api/chat', {
-        messages: [],
-        locationContext: context
-      });
-      
+      const response = await axios.post(
+        "https://basho-xscr.onrender.com/api/chat",
+        {
+          messages: [],
+          locationContext: context,
+        }
+      );
+
       if (response.data.success) {
         // Add AI response to chats
         const updatedChats = chats.map((chat) =>
@@ -70,16 +73,16 @@ const DeepChatPage = () => {
             ? {
                 ...chat,
                 messages: [
-                  { 
-                    id: 1, 
-                    text: response.data.response, 
-                    sender: "system" 
+                  {
+                    id: 1,
+                    text: response.data.response,
+                    sender: "system",
                   },
                 ],
               }
             : chat
         );
-  
+
         setChats(updatedChats);
         localStorage.setItem("chats", JSON.stringify(updatedChats));
       }
@@ -91,20 +94,20 @@ const DeepChatPage = () => {
           ? {
               ...chat,
               messages: [
-                { 
-                  id: 1, 
-                  text: "I'm having trouble connecting to the AI service. Please try again later.", 
-                  sender: "system" 
+                {
+                  id: 1,
+                  text: "I'm having trouble connecting to the AI service. Please try again later.",
+                  sender: "system",
                 },
               ],
             }
           : chat
       );
-      
+
       setChats(updatedChats);
       localStorage.setItem("chats", JSON.stringify(updatedChats));
     }
-    
+
     setIsLoading(false);
   };
 
@@ -122,7 +125,11 @@ const DeepChatPage = () => {
             ...chat,
             messages: [
               ...chat.messages,
-              { id: chat.messages.length + 1, text: messageText, sender: "user" },
+              {
+                id: chat.messages.length + 1,
+                text: messageText,
+                sender: "user",
+              },
             ],
           }
         : chat
@@ -138,13 +145,16 @@ const DeepChatPage = () => {
       const updatedActiveConversation = updatedChats.find(
         (chat) => chat.id === activeChat
       );
-      
+
       // Call the backend endpoint with full message history and location context
-      const response = await axios.post('http://localhost:5000/user/deepchat', {
-        messages: updatedActiveConversation.messages,
-        locationContext: context
-      });
-      
+      const response = await axios.post(
+        "https://basho-xscr.onrender.com/user/deepchat",
+        {
+          messages: updatedActiveConversation.messages,
+          locationContext: context,
+        }
+      );
+
       if (response.data.success) {
         // Add AI response to chats
         const updatedChatsWithResponse = chats.map((chat) =>
@@ -153,10 +163,10 @@ const DeepChatPage = () => {
                 ...chat,
                 messages: [
                   ...chat.messages,
-                  { 
-                    id: chat.messages.length + 2, 
-                    text: response.data.response, 
-                    sender: "system" 
+                  {
+                    id: chat.messages.length + 2,
+                    text: response.data.response,
+                    sender: "system",
                   },
                 ],
               }
@@ -174,7 +184,10 @@ const DeepChatPage = () => {
   };
 
   return (
-    <div className="chat-container bg-primary" style={{ display: "flex", height: "100vh", color: "#e0e0e0" }}>
+    <div
+      className="chat-container bg-primary"
+      style={{ display: "flex", height: "100vh", color: "#e0e0e0" }}
+    >
       {/* Sidebar */}
       <div
         className="sidebar"
@@ -206,7 +219,10 @@ const DeepChatPage = () => {
       </div>
 
       {/* Chat Content */}
-      <div className="chat-content" style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+      <div
+        className="chat-content"
+        style={{ flex: 1, display: "flex", flexDirection: "column" }}
+      >
         {/* Chat Header */}
         <div
           className="chat-header"
@@ -239,7 +255,8 @@ const DeepChatPage = () => {
             <div
               key={message.id}
               style={{
-                alignSelf: message.sender === "user" ? "flex-end" : "flex-start",
+                alignSelf:
+                  message.sender === "user" ? "flex-end" : "flex-start",
                 maxWidth: "70%",
                 padding: "0.75rem",
                 borderRadius: "12px",
