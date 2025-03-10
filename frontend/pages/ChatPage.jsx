@@ -103,89 +103,89 @@ const ChatPage = () => {
       // Add the text prompt
       const text = `GIVEN IMAGES ARE LANDMARK RETURN THE DESCRIPTION, HISTORICAL_SIGNIFICANCE, CONSTRUCTION_TIMELINE, ARCHITECTURAL_FEATURES, INTERESTING_FACTS, MODERN_OUTLOOK AND ADDITTIONAL INQUIERY ${pretext}. ANSWER IN THE LANGUAGE ${language}`;
 
-    formData.append('prompt', text);
-    
-    // Add all images
-    images.forEach((image, index) => {
-      // 1. Extract the Base64 string (removes "data:image/png;base64," part)
-      const byteString = atob(image.split(',')[1]);
-      // 2. Extract the MIME type (e.g., "image/png")
-      const mimeString = image.split(',')[0].split(':')[1].split(';')[0];
-      // 3. Convert the Base64 string to a binary format
-      const ab = new ArrayBuffer(byteString.length);
-      const ia = new Uint8Array(ab);
-      
-      for (let i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i);
+      formData.append("prompt", text);
+
+      // Add all images
+      images.forEach((image, index) => {
+        // 1. Extract the Base64 string (removes "data:image/png;base64," part)
+        const byteString = atob(image.split(",")[1]);
+        // 2. Extract the MIME type (e.g., "image/png")
+        const mimeString = image.split(",")[0].split(":")[1].split(";")[0];
+        // 3. Convert the Base64 string to a binary format
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+
+        for (let i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i);
+        }
+        // 4. Create a Blob from the binary data
+        const blob = new Blob([ab], { type: mimeString });
+        // 5. Append Blob to FormData (for uploading)
+        formData.append("images", blob, `image${index}.png`);
+      });
+
+      // Send the request
+      const response = await fetch(
+        "https://basho-xscr.onrender.com/user/testchat/genLocation",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Server responded with ${response.status}`);
       }
-      // 4. Create a Blob from the binary data
-      const blob = new Blob([ab], { type: mimeString });
-      // 5. Append Blob to FormData (for uploading)
-      formData.append('images', blob, `image${index}.png`);
-    });
-    
 
-    // Send the request
-    const response = await fetch('http://localhost:5000/user/testchat/genLocation', {
-      method: 'POST',
-      body: formData,
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Server responded with ${response.status}`);
-    }
-    
-    const result = await response.json();
+      const result = await response.json();
 
-    // Retrieve existing `data` array from localStorage (if any)
-    const storedData = JSON.parse(localStorage.getItem("data")) || [];
+      // Retrieve existing `data` array from localStorage (if any)
+      const storedData = JSON.parse(localStorage.getItem("data")) || [];
 
-    // Add the entire images array and context
-    storedData.push({
-        images: images,   // Store all images
+      // Add the entire images array and context
+      storedData.push({
+        images: images, // Store all images
         context: result.response, // Store context
-    });
+      });
 
-    // Save updated array back to localStorage
-    localStorage.setItem("data", JSON.stringify(storedData));
+      // Save updated array back to localStorage
+      localStorage.setItem("data", JSON.stringify(storedData));
 
-    
-    // Add Gemini's response to the chat
-    const aiMessage = {
-      id: activeConversation.messages.length + 2,
-      text: result.response,
-      sender: "system",
-    };
-    
-    setChats((prevChats) =>
-      prevChats.map((chat) =>
-        chat.id === activeChat
-          ? { ...chat, messages: [...chat.messages, aiMessage] }
-          : chat
-      )
-    );
-    
-  } catch (error) {
-    console.error("Error sending to Gemini:", error);
-    
-    // Add error message to chat
-    const errorMessage = {
-      id: activeConversation.messages.length + 2,
-      text: `Please add at least one image to send a message. Error: ${error.message}`,
-      sender: "system",
-    };
-    
-    setChats((prevChats) =>
-      prevChats.map((chat) =>
-        chat.id === activeChat
-          ? { ...chat, messages: [...chat.messages, errorMessage] }
-          : chat
-      )
-    );
-  } finally {
-    setIsLoading(false);
-  }
-};
+      // Add Gemini's response to the chat
+      const aiMessage = {
+        id: activeConversation.messages.length + 2,
+        text: result.response,
+        sender: "system",
+      };
+
+      setChats((prevChats) =>
+        prevChats.map((chat) =>
+          chat.id === activeChat
+            ? { ...chat, messages: [...chat.messages, aiMessage] }
+            : chat
+        )
+      );
+    } catch (error) {
+      console.error("Error sending to Gemini:", error);
+
+      // Add error message to chat
+      const errorMessage = {
+        id: activeConversation.messages.length + 2,
+        text: `Please add at least one image to send a message. Error: ${error.message}`,
+        sender: "system",
+      };
+
+      setChats((prevChats) =>
+        prevChats.map((chat) =>
+          chat.id === activeChat
+            ? { ...chat, messages: [...chat.messages, errorMessage] }
+            : chat
+        )
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
