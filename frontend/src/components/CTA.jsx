@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 const CTA = () => {
   const navigate = useNavigate();
   const handleButtonClick = () => {
-    navigate("/chatpage");
+    navigate("/signin");
   };
   return (
     <section
