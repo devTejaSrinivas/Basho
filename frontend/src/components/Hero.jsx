@@ -7,7 +7,7 @@ const Hero = () => {
   const navigate = useNavigate();
 
   const handleGetStartedClick = () => {
-    navigate("/chat");
+    navigate("/signin");
   };
 
   return (
