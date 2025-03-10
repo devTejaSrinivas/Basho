@@ -5,6 +5,8 @@ import { FiSend } from "react-icons/fi"; // Send icon
 import { MdCancel } from "react-icons/md"; // Cancel icon
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
+import AnimatedButton from "../src/components/AnimatedButton";
+import LanguageSelector from "../src/components/LanguageSelector";
 
 const ChatPage = () => {
   const messageContainerRef = useRef(null);
@@ -414,17 +416,25 @@ const ChatPage = () => {
         <div
           style={{
             textAlign: "center",
-            padding: "30px",
-            background: "#444",
-            border: "white 5px solid",
-            borderRadius: "10px",
-            width: "100%",
-            margin: "30px auto",
+            padding: "20px",
+            background: "linear-gradient(135deg, #333, #555)",
+            border: "2px solid #ccc",
+            borderRadius: "8px",
+            width: "90%",
+            maxWidth: "350px",
+            margin: "20px auto",
             color: "#fff",
             fontFamily: "Arial, sans-serif",
+            boxShadow: "0 3px 6px rgba(0,0,0,0.2)",
           }}
         >
-          <h1 style={{ marginBottom: "20px", fontSize: "30px" }}>
+          <h1
+            style={{
+              marginBottom: "15px",
+              fontSize: "24px",
+              letterSpacing: "0.5px",
+            }}
+          >
             Choose Language
           </h1>
 
@@ -432,14 +442,21 @@ const ChatPage = () => {
             onChange={(e) => setLanguage(e.target.value)}
             value={language}
             style={{
-              padding: "15px 15px",
-              fontSize: "16px",
+              padding: "10px",
+              fontSize: "14px",
               borderRadius: "5px",
               border: "1px solid #ccc",
               background: "#222",
               cursor: "pointer",
               outline: "none",
-              marginBottom: "20px",
+              marginBottom: "15px",
+              color: "#fff",
+              appearance: "none",
+              backgroundImage:
+                "url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%2210%22 viewBox=%220 0 10 10%22%3E%3Cpolygon points=%225,7 0,2 10,2%22 fill=%22%23fff%22/%3E%3C/svg%3E')",
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "right 10px center",
+              backgroundSize: "10px 10px",
             }}
           >
             <option value="en">English</option>
@@ -453,34 +470,46 @@ const ChatPage = () => {
           </select>
 
           <p
-            style={{ marginTop: "10px", fontWeight: "bold", fontSize: "30px" }}
+            style={{
+              marginTop: "10px",
+              fontWeight: "bold",
+              fontSize: "18px",
+            }}
           >
             {translations[language]}
           </p>
         </div>
 
+        <AnimatedButton />
         <button
           style={{
             fontSize: "25px",
             width: "100%",
-            padding: "10px 20px",
-            background: "#007bff",
+            padding: "15px 30px",
+            background: "linear-gradient(45deg, #6c757d, #495057)",
             color: "white",
-            border: "white 5px solid",
-            borderRadius: "5px",
+            border: "none",
+            borderRadius: "10px",
             cursor: "pointer",
             outline: "none",
             display: "block",
-            margin: "0 auto",
+            margin: "20px auto",
+            boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+            transition: "transform 0.2s, box-shadow 0.2s",
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.transform = "scale(1.03)";
+            e.currentTarget.style.boxShadow = "0 6px 12px rgba(0,0,0,0.3)";
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.transform = "scale(1)";
+            e.currentTarget.style.boxShadow = "0 4px 8px rgba(0,0,0,0.2)";
           }}
           onClick={() => {
-            navigate("/deepchat");
+            navigate("/");
           }}
         >
-          <b>Deep Talk</b> <br></br>{" "}
-          <span style={{ color: "lightgray" }}>
-            Know more about your "Basho" of interest
-          </span>
+          <b>Back</b>
         </button>
       </div>
 
