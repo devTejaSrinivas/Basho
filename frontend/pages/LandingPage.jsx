@@ -14,37 +14,29 @@ import {
 
 const LandingPage = () => (
   <div
-    style={{ backgroundColor: "#00040f", width: "100%", overflow: "hidden" }}
+    style={{ backgroundColor: "#00040f" }}
+    className="w-full overflow-hidden"
   >
-    <div
-      style={{ padding: "0 2rem", display: "flex", justifyContent: "center" }}
-    >
-      <div style={{ maxWidth: "1200px", width: "100%" }}>
+    <div className={`${styles.paddingX} ${styles.flexCenter}`}>
+      <div className={`${styles.boxWidth}`}>
         <Navbar />
       </div>
     </div>
 
     <div
-      style={{
-        backgroundColor: "#00040f",
-        display: "flex",
-        justifyContent: "start",
-      }}
+      style={{ backgroundColor: "#00040f" }}
+      className={`${styles.flexStart}`}
     >
-      <div style={{ maxWidth: "1200px", width: "100%" }}>
+      <div className={`${styles.boxWidth}`}>
         <Hero />
       </div>
     </div>
 
     <div
-      style={{
-        backgroundColor: "#00040f",
-        padding: "0 2rem",
-        display: "flex",
-        justifyContent: "center",
-      }}
+      style={{ backgroundColor: "#00040f" }}
+      className={`${styles.paddingX} ${styles.flexCenter}`}
     >
-      <div style={{ maxWidth: "1200px", width: "100%" }}>
+      <div className={`${styles.boxWidth}`}>
         <Stats />
         <Business />
         <Testimonials />

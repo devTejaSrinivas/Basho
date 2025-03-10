@@ -29,7 +29,7 @@ const Business = () => {
   const navigate = useNavigate();
 
   const handleButtonClick = () => {
-    navigate("/chatpage");
+    navigate("/chat");
   };
 
   return (
