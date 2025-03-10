@@ -59,6 +59,16 @@ Basho is built using modern web technologies for optimal performance and scalabi
 3. **Discover**: Learn hidden stories, historical facts, and architectural details about the landmark.
 
 ---
+## Screenshots 
+Landing Page
+![image](https://github.com/user-attachments/assets/e34da579-1daf-40da-9e06-918343c60691)
+Footer
+![image](https://github.com/user-attachments/assets/b371b317-25cc-43e5-9711-b298bfb4b284)
+Sign In Page 
+![image](https://github.com/user-attachments/assets/798ae166-a24f-4493-99ff-15f61cc2d789)
+
+
+
 
 <div align="center">
   <h3>Travel Smarter with Basho!</h3>
